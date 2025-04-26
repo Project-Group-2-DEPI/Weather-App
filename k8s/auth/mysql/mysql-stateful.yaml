@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: mysql
-  serviceName: "mysql-headless-service"
+  serviceName: "mysql-service"
   replicas: 1 
   template:
     metadata:
@@ -16,18 +16,34 @@ spec:
       containers:
       - name: mysql
         image: mysql:latest 
-
         env: 
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
              secretKeyRef:
                name: mysql-secrets
-               key: root-password   
+               key: root-password
+        - name: MYSQL_AUTH_PASSWORD
+          valueFrom:
+             secretKeyRef:
+               name: mysql-secrets
+               key: user-password
 
+        volumeMounts:
+        - name: mysql-pvc
+          mountPath: /var/lib/mysql
+
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+
+
+      volumes:
+      - name: init-script
+        configMap:
+          name: mysql-init-script
 
   volumeClaimTemplates:
   - metadata:
-      name: mysql-pv
+      name: mysql-pvc
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "standard"

@@ -14,6 +14,22 @@ spec:
       labels:
         app: weather-auth
     spec:
+      initContainers:
+        - name: wait-for-db
+          image: mysql:latest
+          command: ['sh', '-c',
+            'until mysql -h${DB_HOST} -u${DB_USER} -p${DB_PASSWORD} -e "SELECT 1"; do echo "Waiting for MySQL"; sleep 2; done;']
+          env:
+          - name: DB_HOST
+            value: mysql-headless-service
+          - name: DB_USER
+            value: client
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secrets
+                key: user-password
+
       containers:
         - name: weatherauth-container
           image: aliahmed312/weatherapp-auth:latest
