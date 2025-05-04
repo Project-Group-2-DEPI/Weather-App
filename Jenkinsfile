@@ -61,6 +61,14 @@ pipeline {
               
                }
 
+                withCredentials([file(credentialsId: 'k8s', variable: 'k8s')]) {
+                  
+                  sh "kubectl --kubeconfig=$k8s apply -f k8s/auth/weatherauth-deployment.yaml"   
+                  sh "kubectl --kubeconfig=$k8s apply -f k8s/weather/weather-deployment.yaml"
+                  sh "kubectl --kubeconfig=$k8s apply -f k8s/ui/weatherui-deployment.yaml"    
+
+               }
+
                post {
                     success {
                           slackSend color: "good", message: "${BUILD_TAG} Was Successful"
