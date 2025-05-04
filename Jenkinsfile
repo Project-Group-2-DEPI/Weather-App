@@ -59,7 +59,6 @@ pipeline {
                sh "sed -i 's|image:.*|image: aliahmed312/weatherapp-ui:V.$BUILD_NUMBER|g' k8s/ui/weatherui-deployment.yaml"
 
               
-               }
 
                 withCredentials([file(credentialsId: 'k8s', variable: 'k8s')]) {
                   
@@ -67,6 +66,8 @@ pipeline {
                   sh "kubectl --kubeconfig=$k8s apply -f k8s/weather/weather-deployment.yaml"
                   sh "kubectl --kubeconfig=$k8s apply -f k8s/ui/weatherui-deployment.yaml"    
 
+               }
+                     
                }
 
                post {
